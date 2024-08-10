@@ -35,3 +35,35 @@
     </footer>
 </body>
 </html>
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Chat con PeerJS</title>
+    <style>
+        #localVideo, #remoteVideo {
+            width: 45%;
+            margin: 10px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Chat con PeerJS</h1>
+    <video id="localVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <div>
+        <button id="callButton">Llamar</button>
+        <button id="endButton">Terminar Llamada</button>
+        <p>Tu ID: <span id="my-id"></span></p>
+    </div>
+    <input type="text" id="remoteIdInput" placeholder="ID remoto">
+    
+    <!-- Incluir PeerJS desde el CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.0/dist/peerjs.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
