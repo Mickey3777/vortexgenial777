@@ -1,3 +1,25 @@
+video {
+  background-color: #ddd;
+  border-radius: 7px;
+  margin: 10px 0px 0px 10px;
+  width: 320px;
+  height: 360px;
+  background-image: url("http://www.gifimagesdownload.com/wp-content/uploads/2016/02/background-gif-451.gif");
+}
+button {
+  margin: 5px 0px 0px 10px !important;
+  width: 320px;
+  height: 60px;
+}
+.smallButton {
+  width: 80px;
+  height: 60px;
+}
+#main {
+  display: none;
+}
+
+
 /* styles.css */
 
 body {
