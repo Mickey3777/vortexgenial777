@@ -1,79 +1,100 @@
-// Configuración de PeerJS
-const peer = new Peer({
-    host: 'localhost', // Cambia esto si usas un servidor PeerJS externo o público
-    port: 9000,
-    path: '/'
-});
+var peer = new Peer()
+var myStream
+var peerList = []
 
-const localVideo = document.getElementById('localVideo');
-const remoteVideo = document.getElementById('remoteVideo');
-const callButton = document.getElementById('callButton');
-const endButton = document.getElementById('endButton');
-const remoteIdInput = document.getElementById('remoteIdInput');
-const myIdSpan = document.getElementById('my-id');
 
-let localStream;
-let currentCall;
+//this function will be initiating the peer
+function init(userId){
+  peer = new Peer(userId)
+  peer.on('open',(id)=>{
+    console.log(id+" connected") //if we connect successfully this will print
+  })
 
-// Obtener acceso a la cámara y el micrófono
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    .then(stream => {
-        localVideo.srcObject = stream;
-        localStream = stream;
+  listenToCall()
+}
+
+
+//this function will keep listening to call or incoming events
+function listenToCall(){
+  peer.on('call',(call)=>{
+    navigator.mediaDevices.getUserMedia({
+      video:true,
+      audio: true
+    }).then((stream)=>{
+
+      myStream = stream
+      addLocalVideo(stream)
+      call.answer(stream)
+      call.on('stream',(remoteStream)=>{
+        if(!peerList.includes(call.peer)){
+          addRemoteVideo(remoteStream)
+          peerList.push(call.peer)
+        }
+      })
+    }).catch((err)=>{
+      console.log("unable to connect because "+err)
     })
-    .catch(error => console.error('Error accediendo a la cámara/micrófono: ', error));
+  })
+}
 
-// Al recibir el ID de conexión
-peer.on('open', id => {
-    myIdSpan.textContent = id;
-});
+//this function will be called when we try to make a call
+function makeCall(receiverId){
+    navigator.mediaDevices.getUserMedia({
+      video:true,
+      audio: true
+    }).then((stream)=>{
+      myStream = stream
+      addLocalVideo(stream)
+      let call = peer.call(receiverId,stream)
+      call.on('stream',(remoteStream)=>{
+        if(!peerList.includes(call.peer)){
+          addRemoteVideo(remoteStream)
+          peerList.push(call.peer)
+        }
+      })
+    }).catch((err)=>{
+      console.log("unable to connect because "+err)
+    })
 
-// Responder a una llamada entrante
-peer.on('call', call => {
-    call.answer(localStream); // Responder con el stream local
+}
 
-    call.on('stream', remoteStream => {
-        remoteVideo.srcObject = remoteStream;
-    });
+//this function will add local stream to video pannel
+function addLocalVideo(stream){
+  let video = document.createElement("video")
+  video.srcObject = stream
+  video.classList.add("video")
+  video.muted = true // local video need to be mute because of noise issue
+  video.play()
+  document.getElementById("localVideo").append(video)
+}
 
-    currentCall = call;
-});
+//this function will add remote stream to video pannel
+function addRemoteVideo(stream){
+  let video = document.createElement("video")
+  video.srcObject = stream
+  video.classList.add("video")
+  video.play()
+  document.getElementById("remoteVideo").append(video)
+}
 
-// Hacer una llamada
-callButton.onclick = () => {
-    const remoteId = remoteIdInput.value;
 
-    if (remoteId) {
-        const call = peer.call(remoteId, localStream);
 
-        call.on('stream', remoteStream => {
-            remoteVideo.srcObject = remoteStream;
-        });
+//so far video call is working fine.. lets toggle the video or audio
+function toggleVideo(b){
+  if(b=="true"){
+    myStream.getVideoTracks()[0].enabled = true
+  }
+  else{
+    myStream.getVideoTracks()[0].enabled = false
+  }
+}
 
-        currentCall = call;
-    } else {
-        alert('Por favor, introduce un ID remoto válido.');
-    }
-};
-
-// Terminar la llamada
-endButton.onclick = () => {
-    if (currentCall) {
-        currentCall.close();
-    }
-    remoteVideo.srcObject = null;
-};
-
-// Manejar la desconexión de la llamada
-peer.on('disconnected', () => {
-    console.log('Desconectado del servidor PeerJS');
-});
-
-peer.on('close', () => {
-    console.log('Conexión cerrada');
-    remoteVideo.srcObject = null;
-});
-
-peer.on('error', err => {
-    console.error('Error con PeerJS: ', err);
-});
+//toggle audio
+function toggleAudio(b){
+  if(b=="true"){
+    myStream.getAudioTracks()[0].enabled = true
+  }
+  else{
+    myStream.getAudioTracks()[0].enabled = false
+  }
+}
