@@ -1,100 +1,128 @@
-var peer = new Peer()
-var myStream
-var peerList = []
-
-
-//this function will be initiating the peer
-function init(userId){
-  peer = new Peer(userId)
-  peer.on('open',(id)=>{
-    console.log(id+" connected") //if we connect successfully this will print
-  })
-
-  listenToCall()
-}
-
-
-//this function will keep listening to call or incoming events
-function listenToCall(){
-  peer.on('call',(call)=>{
-    navigator.mediaDevices.getUserMedia({
-      video:true,
-      audio: true
-    }).then((stream)=>{
-
-      myStream = stream
-      addLocalVideo(stream)
-      call.answer(stream)
-      call.on('stream',(remoteStream)=>{
-        if(!peerList.includes(call.peer)){
-          addRemoteVideo(remoteStream)
-          peerList.push(call.peer)
-        }
-      })
-    }).catch((err)=>{
-      console.log("unable to connect because "+err)
+const PRE = "DELTA"
+const SUF = "MEET"
+var room_id;
+var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+var local_stream;
+var screenStream;
+var peer = null;
+var currentPeer = null
+var screenSharing = false
+function createRoom() {
+    console.log("Creating Room")
+    let room = document.getElementById("room-input").value;
+    if (room == " " || room == "") {
+        alert("Please enter room number")
+        return;
+    }
+    room_id = PRE + room + SUF;
+    peer = new Peer(room_id)
+    peer.on('open', (id) => {
+        console.log("Peer Connected with ID: ", id)
+        hideModal()
+        getUserMedia({ video: true, audio: true }, (stream) => {
+            local_stream = stream;
+            setLocalStream(local_stream)
+        }, (err) => {
+            console.log(err)
+        })
+        notify("Waiting for peer to join.")
     })
-  })
-}
-
-//this function will be called when we try to make a call
-function makeCall(receiverId){
-    navigator.mediaDevices.getUserMedia({
-      video:true,
-      audio: true
-    }).then((stream)=>{
-      myStream = stream
-      addLocalVideo(stream)
-      let call = peer.call(receiverId,stream)
-      call.on('stream',(remoteStream)=>{
-        if(!peerList.includes(call.peer)){
-          addRemoteVideo(remoteStream)
-          peerList.push(call.peer)
-        }
-      })
-    }).catch((err)=>{
-      console.log("unable to connect because "+err)
+    peer.on('call', (call) => {
+        call.answer(local_stream);
+        call.on('stream', (stream) => {
+            setRemoteStream(stream)
+        })
+        currentPeer = call;
     })
-
 }
 
-//this function will add local stream to video pannel
-function addLocalVideo(stream){
-  let video = document.createElement("video")
-  video.srcObject = stream
-  video.classList.add("video")
-  video.muted = true // local video need to be mute because of noise issue
-  video.play()
-  document.getElementById("localVideo").append(video)
+function setLocalStream(stream) {
+
+    let video = document.getElementById("local-video");
+    video.srcObject = stream;
+    video.muted = true;
+    video.play();
+}
+function setRemoteStream(stream) {
+
+    let video = document.getElementById("remote-video");
+    video.srcObject = stream;
+    video.play();
 }
 
-//this function will add remote stream to video pannel
-function addRemoteVideo(stream){
-  let video = document.createElement("video")
-  video.srcObject = stream
-  video.classList.add("video")
-  video.play()
-  document.getElementById("remoteVideo").append(video)
+function hideModal() {
+    document.getElementById("entry-modal").hidden = true
 }
 
-
-
-//so far video call is working fine.. lets toggle the video or audio
-function toggleVideo(b){
-  if(b=="true"){
-    myStream.getVideoTracks()[0].enabled = true
-  }
-  else{
-    myStream.getVideoTracks()[0].enabled = false
-  }
+function notify(msg) {
+    let notification = document.getElementById("notification")
+    notification.innerHTML = msg
+    notification.hidden = false
+    setTimeout(() => {
+        notification.hidden = true;
+    }, 3000)
 }
 
-//toggle audio
-function toggleAudio(b){
-  if(b=="true"){
-    myStream.getAudioTracks()[0].enabled = true
-  }
-  else{
-    myStream.getAudioTracks()[0].enabled = false
-  }
+function joinRoom() {
+    console.log("Joining Room")
+    let room = document.getElementById("room-input").value;
+    if (room == " " || room == "") {
+        alert("Please enter room number")
+        return;
+    }
+    room_id = PRE + room + SUF;
+    hideModal()
+    peer = new Peer()
+    peer.on('open', (id) => {
+        console.log("Connected with Id: " + id)
+        getUserMedia({ video: true, audio: true }, (stream) => {
+            local_stream = stream;
+            setLocalStream(local_stream)
+            notify("Joining peer")
+            let call = peer.call(room_id, stream)
+            call.on('stream', (stream) => {
+                setRemoteStream(stream);
+            })
+            currentPeer = call;
+        }, (err) => {
+            console.log(err)
+        })
+
+    })
+}
+
+function startScreenShare() {
+    if (screenSharing) {
+        stopScreenSharing()
+    }
+    navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
+        screenStream = stream;
+        let videoTrack = screenStream.getVideoTracks()[0];
+        videoTrack.onended = () => {
+            stopScreenSharing()
+        }
+        if (peer) {
+            let sender = currentPeer.peerConnection.getSenders().find(function (s) {
+                return s.track.kind == videoTrack.kind;
+            })
+            sender.replaceTrack(videoTrack)
+            screenSharing = true
+        }
+        console.log(screenStream)
+    })
+}
+
+function stopScreenSharing() {
+    if (!screenSharing) return;
+    let videoTrack = local_stream.getVideoTracks()[0];
+    if (peer) {
+        let sender = currentPeer.peerConnection.getSenders().find(function (s) {
+            return s.track.kind == videoTrack.kind;
+        })
+        sender.replaceTrack(videoTrack)
+    }
+    screenStream.getTracks().forEach(function (track) {
+        track.stop();
+    });
+    screenSharing = false
 }
