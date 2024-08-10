@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Vortex</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                
+                
+                <li><a href="ivortex.html">i Vortex</a></li>
+                <li><a href="acerca.html">Vpodcast</a></li>
+                <li><a href="games.html">GAMES 2025</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            
+        
+                
+            
+                
+            <html lang="es">
+            
+            <head>
+            
+                <meta charset="UTF-8">
+            
+                <title>Iniciar Sesión</title>
+            
+            </head>
+            
+            <body>
+            
+                <h1>WELCOM a VORTEX</h1>
+            
+                <form action="crear.html" method="post">
+            
+                    <label for="correo">Correo:</label>
+            
+                    <input type="email" id="correo" name="correo" required><br><br>
+            
+                    <label for="contraseña">Contraseña:</label>
+            
+                    <input type="password" id="contraseña" name="contraseña" required><br><br>
+            
+                    <button type="submit">CERRAR SESION</button>
+            
+                </form>
+            
+                <c:if test="${not empty error}">
+            
+                    <p style="color:red;">$ WELCOM PARSE VORTEX@ ✔😉👽</p>
+                    
+                </c:if>
+            
+            </body>
+            
+            </html>
+
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contacto de WhatsApp</title>
+
+    <!-- Incluye Font Awesome para los iconos -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+
+        body {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            height: 300vh;
+
+            background-color: #f0f0f0;
+
+        }
+
+        .whatsapp-icon {
+
+            font-size: 4rem;
+
+            color: #25D366;
+
+            cursor: pointer;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <i class="fab fa-whatsapp whatsapp-icon" onclick="openWhatsApp()"></i>
+
+    <script>
+
+        function openWhatsApp() {
+
+            var phoneNumber = '3322932322'; // Reemplaza con el número de teléfono del contacto
+
+            var url = 'https://wa.me/' + phoneNumber;
+
+            window.open(url, '_blank');
+
+        }
+
+    </script>
+
+</body>
+
+</html>
+    
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Subir Foto de Perfil</title>
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            margin: 20px;
+
+        }
+
+        .form-container {
+
+            margin-bottom: 20px;
+
+        }
+
+        .album {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+        }
+
+        .album-item {
+
+            margin: 10px;
+
+            text-align: center;
+
+        }
+
+        .album-item img {
+
+            max-width: 85px;
+
+            max-height: 85px;
+
+            display: block;
+
+            margin-bottom: 11px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h2>Registro de Usuario</h2>
+
+    <div class="form-container">
+
+        <form id="userForm">
+
+            <label for="username">Nombre de Usuario:</label><br>
+
+            <input type="text" id="username" name="username" required><br><br>
+
+            
+
+            <label for="profile_picture">Foto de Perfil:</label><br>
+
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required><br><br>
+
+            
+
+            <button type="button" onclick="addToAlbum()">Agregar al Álbum</button>
+
+        </form>
+
+    </div>
+
+    <h2>Álbum de Fotos</h2>
+
+    <div class="album" id="album">
+
+        <!-- Aquí se agregarán las fotos y nombres -->
+
+    </div>
+
+    <script>
+
+        function addToAlbum() {
+
+            // Obtener el nombre de usuario
+
+            const username = document.getElementById('username').value;
+
+            // Obtener el archivo de la foto
+
+            const fileInput = document.getElementById('profile_picture');
+
+            const file = fileInput.files[0];
+
+            if (file && username) {
+
+                const reader = new FileReader();
+
+                // Crear un nuevo item para el álbum
+
+                reader.onload = function(e) {
+
+                    const album = document.getElementById('album');
+
+                    const newItem = document.createElement('div');
+
+                    newItem.classList.add('album-item');
+
+                    // Crear la imagen
+
+                    const img = document.createElement('img');
+
+                    img.src = e.target.result;
+
+                    // Crear el nombre de usuario
+
+                    const caption = document.createElement('p');
+
+                    caption.textContent = username;
+
+                    // Añadir la imagen y el nombre al item
+
+                    newItem.appendChild(img);
+
+                    newItem.appendChild(caption);
+
+                    // Añadir el nuevo item al álbum
+
+                    album.appendChild(newItem);
+
+                    // Limpiar el formulario
+
+                    document.getElementById('userForm').reset();
+
+                };
+
+                // Leer la imagen como un Data URL
+
+                reader.readAsDataURL(file);
+
+            } else {
+
+                alert('Por favor ingresa un nombre de usuario y selecciona una foto.');
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>
+
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Abrir y Cerrar Cámara y Micrófono</title>
+
+</head>
+
+<body>
+
+<h1>Control de Cámara y Micrófono</h1>
+
+<!-- Video para mostrar la cámara -->
+
+<video id="video" width="640" height="480" autoplay></video>
+
+<!-- Botones para abrir y cerrar cámara/micrófono -->
+
+<button id="startButton">Abrir Cámara y Micrófono</button>
+
+<button id="stopButton">Cerrar Cámara y Micrófono</button>
+
+<script>
+
+    const videoElement = document.getElementById('video');
+
+    const startButton = document.getElementById('startButton');
+
+    const stopButton = document.getElementById('stopButton');
+
+    let mediaStream = null;
+
+    // Función para iniciar la cámara y el micrófono
+
+    startButton.addEventListener('click', async () => {
+
+        try {
+
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+            videoElement.srcObject = mediaStream;
+
+        } catch (err) {
+
+            console.error('Error al acceder a la cámara y/o micrófono:', err);
+
+        }
+
+    });
+
+    // Función para detener la cámara y el micrófono
+
+    stopButton.addEventListener('click', () => {
+
+        if (mediaStream) {
+
+            const tracks = mediaStream.getTracks();
+
+            tracks.forEach(track => track.stop());
+
+            videoElement.srcObject = null;
+
+        }
+
+    });
+
+</script>
+
+</body>
+
+</html>
+
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Videollamadas</title>
+
+    <style>
+
+        video {
+
+            width: 112%;
+
+            height: auto;
+
+            border: 1px solid black;
+
+        }
+
+        #localVideo {
+
+            float: left;
+
+        }
+
+        #remoteVideo {
+
+            float: right;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>Videollamadas</h1>
+
+<video id="localVideo" autoplay muted></video>
+
+<video id="remoteVideo" autoplay></video>
+
+<button id="startCall">Iniciar Llamada</button>
+
+<button id="endCall">Terminar Llamada</button>
+
+<script>
+
+    const localVideo = document.getElementById('localVideo');
+
+    const remoteVideo = document.getElementById('remoteVideo');
+
+    const startCallButton = document.getElementById('startCall');
+
+    const endCallButton = document.getElementById('endCall');
+
+    let localStream;
+
+    let remoteStream;
+
+    let peerConnection;
+
+    const config = {
+
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+
+    };
+
+    startCallButton.addEventListener('click', startCall);
+
+    endCallButton.addEventListener('click', endCall);
+
+    async function startCall() {
+
+        try {
+
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+            localVideo.srcObject = localStream;
+
+            peerConnection = new RTCPeerConnection(config);
+
+            peerConnection.onicecandidate = event => {
+
+                if (event.candidate) {
+
+                    // Enviar la oferta al otro lado
+
+                    console.log('ICE Candidate:', event.candidate);
+
+                }
+
+            };
+
+            peerConnection.ontrack = event => {
+
+                remoteVideo.srcObject = event.streams[0];
+
+            };
+
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            // Crear una oferta y establecerla en la conexión
+
+            const offer = await peerConnection.createOffer();
+
+            await peerConnection.setLocalDescription(offer);
+
+            // Enviar la oferta al servidor
+
+            console.log('Offer:', offer);
+
+            // Simular recibir una respuesta del otro lado (esto normalmente lo harías a través de un servidor)
+
+            // Aquí deberías implementar el intercambio real de ofertas y respuestas
+
+        } catch (error) {
+
+            console.error('Error al iniciar la llamada:', error);
+
+        }
+
+    }
+
+    function endCall() {
+
+        if (peerConnection) {
+
+            peerConnection.close();
+
+            peerConnection = null;
+
+        }
+
+        if (localStream) {
+
+            localStream.getTracks().forEach(track => track.stop());
+
+        }
+
+        localVideo.srcObject = null;
+
+        remoteVideo.srcObject = null;
+
+    }
+
+</script>
+
+</body>
+
+</html> 
+
+<button id="blockButton">Bloquear Usuario</button>
+
+
+
+
