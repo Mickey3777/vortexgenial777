@@ -10,7 +10,7 @@ $username = "sql5723954";
 $password = "8bNKjjmTEj";
 $dbname = "sql5723954";  
 $mysqli = new mysqli($servername, $username, $password, $dbname);
-//captura de datos pasados desde ivortex.html
+//captura de datos pasados desde crear.html
 $nombre = $_POST["nombre"];
 $correo = $_POST["correo"];
 $telefono = $_POST["telefono"];
