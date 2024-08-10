@@ -27,7 +27,7 @@
             <!-- Información sobre la empresa -->
             <p>VIVA EL AMOR WELCOME HOLA MUNDO IS VORTEX GENIAL 😉✔👽</p>
             <p>memorandum cuida tu vista camina en reversa regenera tu vision#1</p>
-            <p>memorandum cuida tu audicion escucha solo 1 hora la musica</p>
+            <p>memorandum cuida tu audicion escucha solo 1 hora la musica#2</p>
         </section>
     </main>
     <footer>
@@ -37,33 +37,24 @@
 </html>
 
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Chat con PeerJS</title>
-    <style>
-        #localVideo, #remoteVideo {
-            width: 45%;
-            margin: 10px;
-            border: 1px solid black;
-        }
-    </style>
-</head>
-<body>
-    <h1>Video Chat con PeerJS</h1>
-    <video id="localVideo" autoplay playsinline></video>
-    <video id="remoteVideo" autoplay playsinline></video>
-    <div>
-        <button id="callButton">Llamar</button>
-        <button id="endButton">Terminar Llamada</button>
-        <p>Tu ID: <span id="846310520"></span></p>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body>
+    <div style="display:block;justify-content:space-around;margin:0px">
+
+      <div class="primary-video" id="remoteVideo"></div>
+      <div class="secondary-video" id="localVideo"></div>
+
     </div>
-    <input type="text" id="remoteIdInput" placeholder="ID remoto">
-    
-    <!-- Incluir PeerJS desde el CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.0/dist/peerjs.min.js"></script>
-    <script src="script.js"></script>
-</body>
+
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script src="./calljs.js">
+</script>
+
+  </body>
+
 </html>
