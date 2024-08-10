@@ -1,7 +1,7 @@
 <!--
 la linea refresh, le indica al navegador dentro de cuantos seguundos (en este caso cero que significa instantaneamente) se ira a tal url (en este caso ivortex.html del mismo directorio)
 !-->
-<meta http-equiv="refresh" content="0;url=crear.html">
+<meta http-equiv="refresh" content="0;url=ivortex.html">
 
 <?php
 //Credenciales
