@@ -1,293 +1,34 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I Vortex</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <nav>
-            <ul>
-                
-                
-                <li><a href="ivortex.html">i Vortex</a></li>
-                <li><a href="acerca.html">Vpodcast</a></li>
-                <li><a href="games.html">GAMES 2025</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section>
-            
-        
-                
-            
-                
-            <html lang="es">
-            
-            <head>
-            
-                <meta charset="UTF-8">
-            
-                <title>Iniciar Sesión</title>
-            
-            </head>
-            
-            <body>
-            
-                <h1>WELCOM a VORTEX</h1>
-            
-                <form action="crear.html" method="post">
-       
-            
-              <button type="submit">CERRAR SESION</button>
-            
-                </form>
-            
-                <c:if test="${not empty error}">
-            
-                    <p style="color:red;">$ WELCOM PARSE VORTEX@ ✔😉👽</p>
-                    
-                </c:if>
-            
-            </body>
-            
-            </html>
-
-
-<!DOCTYPE html>
-<html lang="es">
+<html>
 
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Contacto de WhatsApp</title>
-
-    <!-- Incluye Font Awesome para los iconos -->
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <style>
-
-        body {
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            height: 300vh;
-
-            background-color: #f0f0f0;
-
-        }
-
-        .whatsapp-icon {
-
-            font-size: 4rem;
-
-            color: #25D366;
-
-            cursor: pointer;
-
-        }
-
-    </style>
-
+    <title>Delta Meet</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
 <body>
+    <h1 class="title">Delta Meet</h1>
+    <p id="notification" hidden></p>
+    <div class="entry-modal" id="entry-modal">
+        <p>Create or Join Meeting</p>
+        <input id="room-input" class="room-input" placeholder="Enter Room ID">
+        <div>
+            <button onclick="createRoom()">Create Room</button>
+            <button onclick="joinRoom()">Join Room</button>
+        </div>
+    </div>
+    <div class="meet-area">
+        <!-- Remote Video Element-->
+        <video id="remote-video"></video>
 
-    <i class="fab fa-whatsapp whatsapp-icon" onclick="openWhatsApp()"></i>
-
-    <script>
-
-        function openWhatsApp() {
-
-            var phoneNumber = '3322932322'; // Reemplaza con el número de teléfono del contacto
-
-            var url = 'https://wa.me/' + phoneNumber;
-
-            window.open(url, '_blank');
-
-        }
-
-    </script>
-
+        <!-- Local Video Element-->
+        <video id="local-video"></video>
+        <div class="meet-controls-bar">
+            <button onclick="startScreenShare()">Screen Share</button>
+        </div>
+    </div>
 </body>
 
-</html>
-    
-<!DOCTYPE html>
-
-<html lang="es">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Subir Foto de Perfil</title>
-
-    <style>
-
-        body {
-
-            font-family: Arial, sans-serif;
-
-            margin: 20px;
-
-        }
-
-        .form-container {
-
-            margin-bottom: 20px;
-
-        }
-
-        .album {
-
-            display: flex;
-
-            flex-wrap: wrap;
-
-        }
-
-        .album-item {
-
-            margin: 10px;
-
-            text-align: center;
-
-        }
-
-        .album-item img {
-
-            max-width: 85px;
-
-            max-height: 85px;
-
-            display: block;
-
-            margin-bottom: 11px;
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <h2>Registro de Usuario</h2>
-
-    <div class="form-container">
-
-        <form id="userForm">
-
-            <label for="username">Nombre de Usuario:</label><br>
-
-            <input type="text" id="username" name="username" required><br><br>
-
-            
-
-            <label for="profile_picture">Foto de Perfil:</label><br>
-
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required><br><br>
-
-            
-
-            <button type="button" onclick="addToAlbum()">Agregar al Álbum</button>
-
-        </form>
-
-    </div>
-
-    <h2>Álbum de Fotos</h2>
-
-    <div class="album" id="album">
-
-        <!-- Aquí se agregarán las fotos y nombres -->
-
-    </div>
-
-    <script>
-
-        function addToAlbum() {
-
-            // Obtener el nombre de usuario
-
-            const username = document.getElementById('username').value;
-
-            // Obtener el archivo de la foto
-
-            const fileInput = document.getElementById('profile_picture');
-
-            const file = fileInput.files[0];
-
-            if (file && username) {
-
-                const reader = new FileReader();
-
-                // Crear un nuevo item para el álbum
-
-                reader.onload = function(e) {
-
-                    const album = document.getElementById('album');
-
-                    const newItem = document.createElement('div');
-
-                    newItem.classList.add('album-item');
-
-                    // Crear la imagen
-
-                    const img = document.createElement('img');
-
-                    img.src = e.target.result;
-
-                    // Crear el nombre de usuario
-
-                    const caption = document.createElement('p');
-
-                    caption.textContent = username;
-
-                    // Añadir la imagen y el nombre al item
-
-                    newItem.appendChild(img);
-
-                    newItem.appendChild(caption);
-
-                    // Añadir el nuevo item al álbum
-
-                    album.appendChild(newItem);
-
-                    // Limpiar el formulario
-
-                    document.getElementById('userForm').reset();
-
-                };
-
-                // Leer la imagen como un Data URL
-
-                reader.readAsDataURL(file);
-
-            } else {
-
-                alert('Por favor ingresa un nombre de usuario y selecciona una foto.');
-
-            }
-
-        }
-
-    </script>
-
-</body>
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script src="script.js"></script>
 
 </html>
