@@ -1,4 +1,3 @@
-
 var peer = new Peer()
 var myStream
 var peerList = []
