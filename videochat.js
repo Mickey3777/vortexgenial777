@@ -1,121 +1,101 @@
-const localVideo = document.getElementById('localVideo');
 
-const remoteVideo = document.getElementById('remoteVideo');
+var peer = new Peer()
+var myStream
+var peerList = []
 
-const generatedIdTextArea = document.getElementById('generatedId');
 
-const connectionIdTextArea = document.getElementById('connectionId');
+//this function will be initiating the peer
+function init(userId){
+  peer = new Peer(userId)
+  peer.on('open',(id)=>{
+    console.log(id+" connected") //if we connect successfully this will print
+  })
 
-let localStream;
+  listenToCall()
+}
 
-let remoteStream;
 
-let peerConnection;
+//this function will keep listening to call or incoming events
+function listenToCall(){
+  peer.on('call',(call)=>{
+    navigator.mediaDevices.getUserMedia({
+      video:true,
+      audio: true
+    }).then((stream)=>{
 
-const servers = {
+      myStream = stream
+      addLocalVideo(stream)
+      call.answer(stream)
+      call.on('stream',(remoteStream)=>{
+        if(!peerList.includes(call.peer)){
+          addRemoteVideo(remoteStream)
+          peerList.push(call.peer)
+        }
+      })
+    }).catch((err)=>{
+      console.log("unable to connect because "+err)
+    })
+  })
+}
 
-    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-
-};
-
-// Función para inicializar la cámara y el micrófono
-
-async function startLocalStream() {
-
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-
-    localVideo.srcObject = localStream;
+//this function will be called when we try to make a call
+function makeCall(receiverId){
+    navigator.mediaDevices.getUserMedia({
+      video:true,
+      audio: true
+    }).then((stream)=>{
+      myStream = stream
+      addLocalVideo(stream)
+      let call = peer.call(receiverId,stream)
+      call.on('stream',(remoteStream)=>{
+        if(!peerList.includes(call.peer)){
+          addRemoteVideo(remoteStream)
+          peerList.push(call.peer)
+        }
+      })
+    }).catch((err)=>{
+      console.log("unable to connect because "+err)
+    })
 
 }
 
-// Crear conexión de WebRTC y establecer los eventos necesarios
-
-function createPeerConnection() {
-
-    peerConnection = new RTCPeerConnection(servers);
-
-    peerConnection.onicecandidate = (event) => {
-
-        if (event.candidate) {
-
-            console.log('Nueva candidata ICE: ', event.candidate);
-
-            // Enviar al otro peer a través de un servidor de señalización
-
-        }
-
-    };
-
-    peerConnection.ontrack = (event) => {
-
-        if (!remoteStream) {
-
-            remoteStream = new MediaStream();
-
-            remoteVideo.srcObject = remoteStream;
-
-        }
-
-        remoteStream.addTrack(event.track);
-
-    };
-
-    localStream.getTracks().forEach(track => {
-
-        peerConnection.addTrack(track, localStream);
-
-    });
-
+//this function will add local stream to video pannel
+function addLocalVideo(stream){
+  let video = document.createElement("video")
+  video.srcObject = stream
+  video.classList.add("video")
+  video.muted = true // local video need to be mute because of noise issue
+  video.play()
+  document.getElementById("localVideo").append(video)
 }
 
-// Función para generar un ID (simulado) y crear una oferta SDP
+//this function will add remote stream to video pannel
+function addRemoteVideo(stream){
+  let video = document.createElement("video")
+  video.srcObject = stream
+  video.classList.add("video")
+  video.play()
+  document.getElementById("remoteVideo").append(video)
+}
 
-document.getElementById('generateIdBtn').addEventListener('click', async () => {
 
-    await startLocalStream();
 
-    createPeerConnection();
+//so far video call is working fine.. lets toggle the video or audio
+function toggleVideo(b){
+  if(b=="true"){
+    myStream.getVideoTracks()[0].enabled = true
+  }
+  else{
+    myStream.getVideoTracks()[0].enabled = false
+  }
+}
 
-    const offer = await peerConnection.createOffer();
-
-    await peerConnection.setLocalDescription(offer);
-
-    const id = btoa(JSON.stringify(offer));
-
-    generatedIdTextArea.value = id;
-
-});
-
-// Función para conectar utilizando un ID
-
-document.getElementById('connectBtn').addEventListener('click', async () => {
-
-    await startLocalStream();
-
-    createPeerConnection();
-
-    const offer = JSON.parse(atob(connectionIdTextArea.value));
-
-    await peerConnection.setRemoteDescription(offer);
-
-    const answer = await peerConnection.createAnswer();
-
-    await peerConnection.setLocalDescription(answer);
-
-    // Aquí se debería enviar esta respuesta al otro peer (por ejemplo, usando WebSockets)
-
-});
-
-// Evento para manejar la recepción de una respuesta (en un escenario real sería desde un servidor de señalización)
-
-connectionIdTextArea.addEventListener('input', async () => {
-
-    if (peerConnection && peerConnection.signalingState === "have-local-offer") {
-
-        const answer = JSON.parse(atob(connectionIdTextArea.value));
-
-        await peerConnection.setRemoteDescription(answer);
-
-    }
-
-});
+//toggle audio
+function toggleAudio(b){
+  if(b=="true"){
+    myStream.getAudioTracks()[0].enabled = true
+  }
+  else{
+    myStream.getAudioTracks()[0].enabled = false
+  }
+}
