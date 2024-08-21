@@ -1,86 +1,20 @@
-
-/* styles.css */
-
-body {
-
-    font-family: Arial, sans-serif;
-
-    background-color: #3fffaf;
-
-    margin: 0;
-
-    padding: 0;
-
-}
-
-header {
-
-    background-color: #270833;
-
-    color: #00e1ff;
-
-    padding: 37px;
-
-}
-
-nav ul {
-
-    list-style-type: none;
-
-    margin: 0;
-
-    padding: 0;
-
-}
-
-nav ul li {
-
-    display: inline;
-
-    margin-right: 25px;
-
-}
-
-nav ul li a {
-
-    color: #f3ffaf;
-
-    text-decoration: none;
-
-}
-
-main {
-
-    padding: 20px;
-
-}
-
-footer {
-
-    background-color: #333;
-
-    color: #3dffb5;
-
-    text-align: center;
-
-    padding: 10px;
-
-    position: absolute;
-
-    bottom: 0;
-
-    width: 100%;
-
-}
-
 video {
-    background-color: #ddd;
-    border-radius: 7px;
-    margin: 10px 0px 0px 10px;
-    width: 320px;
-    height: 240px;
+  background-color: #ddd;
+  border-radius: 7px;
+  margin: 10px 0px 0px 10px;
+  width: 320px;
+  height: 360px;
+  background-image: url("http://www.gifimagesdownload.com/wp-content/uploads/2016/02/background-gif-451.gif");
 }
 button {
-    margin: 5px 0px 0px 10px !important;
-    width: 300px;
+  margin: 5px 0px 0px 10px !important;
+  width: 320px;
+  height: 60px;
+}
+.smallButton {
+  width: 80px;
+  height: 60px;
+}
+#main {
+  display: none;
 }
