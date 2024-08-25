@@ -1,118 +1,45 @@
-// Steps -
-// 1. Display MediaStream of yourself on your PC - peer 2 also does this on theirs
-// 2. Create a Peer Connection
-// 3. Create an offer (SDP) and add it to your PeerConnection
-// 4. Send the offer to peer 2's computer, and add it to their PeerConnection
-// 5. Generate ICE candidates and send to peer 2
-// 6. Add ICE candidates to peer 2's computer
-// 7. Peer 2 creates answer object and sends it to peer 1
-// 8. Peer 1 adds answer to PeerConnection
-// 9. Peer 2 generates ICE candidates and sends them to Peer 1
-// 10. Establish media connection, displaying MediaStream(s) on each other's computers
-// Configuration for connection to the Firebase signalling server
-var firebaseConfig = {
-  apiKey: "AIzaSyC7f6kc1wpnX7d9hIeVVqG_0axzY9doZv4",
-    authDomain: "webrtc-video-calling.firebaseapp.com",
-    databaseURL: "https://webrtc-video-calling.firebaseio.com",
-    projectId: "webrtc-video-calling",
-    storageBucket: "webrtc-video-calling.appspot.com",
-    messagingSenderId: "871624622760"
-};
-firebase.initializeApp(firebaseConfig);
-// Get access to the root of the Firebase database (Firebase allows real time data changes, so all connected peers see changes instantly. Such as google docs)
-var database = firebase.database().ref();
-var yourVideo = document.getElementById("yourVideo");
-var friendsVideo = document.getElementById("friendsVideo");
-// Random ID assigned to users. This is important because when Offer, Answer and ICE candidate objects are sent
-// This is important because these are delivered by Firebase to yourself and your friend
-// Therefore, the message will be ignored if it sent by yourself (your ID)
-var yourId = Math.floor(Math.random()*1000000000);
-// Declare what STUN/TURN servers will be used. It's good to add more than one STUN server
-// Because if one doesn't work, then WebRTC will automatically try the next server.
-var servers = {'iceServers': [{'urls': 'stun:stun.services.mozilla.com'}, {'urls': 'stun:stun.l.google.com:19302'}, {'urls': 'turn:numb.viagenie.ca','credential': 'root123','username': 'matthew.sayer1@gmail.com'}]};
-var pc = new RTCPeerConnection(servers);
-// Waits for an ICE candidate to be created on your computer
-// When an ICE candidate is created, this function turns the JSON object into a String
-// Then it sends the String to Peer 2 via the Firebase signalling server
-// This will be reciprocated by Peer 2. All ICE candidates sent one at a time.
-pc.onicecandidate = (event => event.candidate?sendMessage(yourId, JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
-// Waits for waits for all the objects to be sent (Offer, Answer and ICE Candidates)
-// After this, the peer 2's media stream (video) will be available, and yours will be available to peer 2
-// Onaddstream is called, and friend's video is added to the remote video stream
-pc.onaddstream = (event => friendsVideo.srcObject = event.stream);
-// Sends Offer object to peer 2.
-function sendMessage(senderId, data) {
-    var msg = database.push({ sender: senderId, message: data });
-    msg.remove();
-}
-// Makes the video chat client appear and starts video feed
-function showApp() {
-  showMyFace();
-  document.getElementById("main").style.display = "block";
-  document.getElementById("loadApp").style.display = "none";
-}
-// Is used by peer 2 to read the offer message
-function readMessage(data) {
-  // Converts received ICE candidate String back into a JSON object
-    var msg = JSON.parse(data.val().message);
-    var sender = data.val().sender;
-    // If the sender is not yourself, then read the Firebase message
-    if (sender != yourId) {
-        if (msg.ice != undefined)
-        // Adds the ICE candidate to the Peer Connection
-        // Peer 2 then adds ICE candidates that they have received using this function as well
-            pc.addIceCandidate(new RTCIceCandidate(msg.ice));
-        else if (msg.sdp.type == "offer")
-        // Once offer object is read, peer 2 calls this
-        // It sets the offer object to their remote description
-        // Then, an answer object is created which the other peer will set their local description to
-        // It is then sent back using sendMessage
-            pc.setRemoteDescription(new RTCSessionDescription(msg.sdp))
-              .then(() => pc.createAnswer())
-              // Several ICE candidates will be created at this stage, so pc.onicecandidate will be called
-              // once for each ICE candidate created
-              .then(answer => pc.setLocalDescription(answer))
-              .then(() => sendMessage(yourId, JSON.stringify({'sdp': pc.localDescription})));
-        else if (msg.sdp.type == "answer")
-            pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-    }
-};
-// Allows us to add something to the Firebase database using the sendMessage function
-database.on('child_added', readMessage);
-// Called when the HTML page loads, gets the video stream from the local device webcam
-// Calling getUserMedia prompts the browser to ask your permission to access webcam/microphone
-function showMyFace() {
-  navigator.mediaDevices.getUserMedia({audio:true, video:true})
-  // Once the browser has permission, it will get your webcam/mic stream and put it into your video section
-  // Both peers do this
-    .then(stream => yourVideo.srcObject = stream)
-    .then(stream => pc.addStream(stream));
-}
-// Called when clicking the Call button on the HTML page, displays remote video stream from peer 2
-// pc.createOffer creates an Offer object, and sets your local description to this offer.
-// This offer object is sent to Peer 2 by calling sendMessage.
-function showFriendsFace() {
-  pc.createOffer()
-    .then(offer => pc.setLocalDescription(offer) )
-    .then(() => sendMessage(yourId, JSON.stringify({'sdp': pc.localDescription})) );
-}
+<html>
+  <head>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+    <script src="../JS/main.js"></script>
+    <script src="../JS/codigo.js"></script>
 
-function endCall() {
-  pc.close();
-  window.location.reload(true);
-}
-
-function openInfo() {
-  var modal = document.getElementById('infoModal');
-  var btn = document.getElementById('infoButton');
-  var span = document.getElementsByClassName("close")[0];
-  modal.style.display = "block";
-  span.onclick = function () {
-    modal.style.display = "none";
-  }
-  window.onclick = function(event) {
-    if(event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
-}
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- Imported firebase JS lib for signalling, and Bootstrap for styling -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body onload="showMyFace()">
+    <div id="loadApp" class="jumbotron">
+      <h1 class="display-3">Welcome to WebRTC.</h1>
+      <p class="lead">Start a video chat between you and another peer, communicating in real time through your browser.</p>
+    <button onclick="showApp()" class="btn btn-primary btn-lg center-block">Enter Video Room</button>
+      <button id="infoButton" class="btn smallButton btn-outline-secondary" onclick="openInfo()"><svg style="width:30px;height:30px" viewBox="0 -1 24 24">
+    <path fill="#000000" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" />
+</svg><span></span></button>
+    </div>
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <span class="close" aria-hidden="true">&times;</span>
+        <div class="modal-header">
+        <h5 class="modal-title">How does this app work?</h5>
+        </div>
+        <div class="modal-body">
+          <p>This application uses WebRTC APIs to establish real-time communication through your web browser with another peer, who is also connected to the session by having an instance of this app open on their device.<p>
+          </div>
+      </div>
+    </div>
+    <div id="main" class="jumbotron align-middle">
+    <video id='yourVideo' autoplay muted></video>
+    <video id='friendsVideo' autoplay></video>
+    <br />
+    <button onclick='showFriendsFace()' type='button' class='btn btn-primary btn-lg bg-success'>Start Video Call <span><svg width="30" height="30" viewBox="0 -6 24 24">
+  <path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"></path>
+</svg></span></button>
+    <button onclick='endCall()' type='button' class='btn btn-primary btn-lg bg-danger'>End Call <span> <svg width="20" height="20" viewBox="0 0 24 24">
+  <path d="M12,0A12,12 0 0,1 24,12A12,12 0 0,1 12,24A12,12 0 0,1 0,12A12,12 0 0,1 12,0M12,2A10,10 0 0,0 2,12C2,14.4 2.85,16.6 4.26,18.33L18.33,4.26C16.6,2.85 14.4,2 12,2M12,22A10,10 0 0,0 22,12C22,9.6 21.15,7.4 19.74,5.67L5.67,19.74C7.4,21.15 9.6,22 12,22Z"></path>
+</svg></span></button>
+    </div>
+  </body>
+</html>
